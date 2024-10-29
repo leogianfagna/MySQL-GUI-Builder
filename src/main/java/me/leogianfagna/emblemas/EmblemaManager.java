@@ -53,5 +53,19 @@ public class EmblemaManager {
         }
         return false;
     }
+
+    public int contarPossuidoresEmblema(String emblemaId) {
+        String query = "SELECT COUNT(*) FROM user_emblemas WHERE emblema_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, emblemaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1); // Retorna a contagem
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Retorna 0 se houver algum problema
+    }
 }
 

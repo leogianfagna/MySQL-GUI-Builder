@@ -91,7 +91,7 @@ public class EmblemaGUI {
                     "§a» §fLançamento: §7" + emblema.getDataLancamento(),
                     "§a» §fExclusividade: §7" + emblema.getLocalLancamento(),
                     "§a» §fConquistável: §7" + emblema.getModoConquista(),
-                    "§a» §fPossuído por: §7200"));
+                    "§a» §fPossuído por: §7" + emblemaManager.contarPossuidoresEmblema(emblema.getIdentificador())));
 
             // Verifica se o jogador possui o emblema
             if (emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador())) {
