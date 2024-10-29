@@ -28,19 +28,33 @@ public class AddEmblemaCommand implements CommandExecutor {
             return true;
         }
 
-        // Verifica se a quantidade mínima de argumentos foi fornecida
         if (args.length < 10) {
-            sender.sendMessage(
-                    "Uso incorreto pois está com menos de 10 argumentos! Use: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
+            sender.sendMessage("Uso incorreto! Use: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
             return true;
         }
 
-        // Combina todos os argumentos em uma única string para facilitar a análise
+        List<String> argumentos = parseArguments(args);
+        if (argumentos.size() < 11) {
+            sender.sendMessage("Uso incorreto! Verifique os argumentos fornecidos.");
+            return true;
+        }
+
+        try {
+            inserirEmblemaNoBanco(argumentos, sender);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            sender.sendMessage("Erro ao adicionar o emblema. Detalhes do erro: " + e.getMessage());
+        }
+
+        return true;
+    }
+
+    // Possibilitar colocar argumentos entre aspas, pois descrições ou nome dos emblemas exigem espaços e isso causaria a leitura de argumentos a mais
+    private List<String> parseArguments(String[] args) {
         String input = String.join(" ", args);
         List<String> argumentos = new ArrayList<>();
-
-        // Expressão regular para capturar texto entre aspas ou palavras isoladas
         Matcher matcher = Pattern.compile("\"([^\"]*)\"|(\\S+)").matcher(input);
+
         while (matcher.find() && argumentos.size() < 11) {
             if (matcher.group(1) != null) {
                 argumentos.add(matcher.group(1)); // Argumento entre aspas
@@ -49,26 +63,15 @@ public class AddEmblemaCommand implements CommandExecutor {
             }
         }
 
-        // Verifica se todos os argumentos necessários foram fornecidos após o parse
-        if (argumentos.size() < 11) {
-            sender.sendMessage(
-                    "Uso incorreto pois entrou no outro if que não sei o que significa! Use: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
-            return true;
-        }
+        return argumentos;
+    }
 
-        // Parseando os argumentos
+    private void inserirEmblemaNoBanco(List<String> argumentos, CommandSender sender) throws SQLException {
         String nome = argumentos.get(0);
         String identificador = argumentos.get(1);
         String categoria = argumentos.get(2);
-        int idConquistado;
-        int idNaoConquistado;
-        try {
-            idConquistado = Integer.parseInt(argumentos.get(3));
-            idNaoConquistado = Integer.parseInt(argumentos.get(4));
-        } catch (NumberFormatException e) {
-            sender.sendMessage("IDs devem ser números inteiros.");
-            return true;
-        }
+        int idConquistado = parseInt(argumentos.get(3), sender);
+        int idNaoConquistado = parseInt(argumentos.get(4), sender);
         String descricaoRapida = argumentos.get(5);
         String descricaoCompleta = argumentos.get(6);
         String raridade = argumentos.get(7);
@@ -76,10 +79,8 @@ public class AddEmblemaCommand implements CommandExecutor {
         String localLancamento = argumentos.get(9);
         String modoConquista = argumentos.get(10);
 
-        sender.sendMessage("Argumentos processados com sucesso. Iniciando inserção no banco de dados.");
-
-        // Inserindo no banco de dados
         String sql = "INSERT INTO emblemas (nome, identificador, categoria, custom_conquistado, custom_black, descricao_rapida, descricao_completa, raridade, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, nome);
             stmt.setString(2, identificador);
@@ -99,13 +100,15 @@ public class AddEmblemaCommand implements CommandExecutor {
             } else {
                 sender.sendMessage("A inserção falhou, nenhuma linha foi afetada.");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            sender.sendMessage("Erro ao adicionar o emblema. Detalhes do erro: " + e.getMessage());
         }
-
-        sender.sendMessage("Finalizando execução do comando.");
-        return true;
     }
 
+    private int parseInt(String input, CommandSender sender) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            sender.sendMessage("IDs devem ser números inteiros.");
+            return 0;
+        }
+    }
 }
