@@ -19,63 +19,79 @@ import java.util.Set;
 
 public class EmblemaGUI {
 
+    private static final String CONFIG_FILE_NAME = "emblemas_gui.yml";
+    private static final String CONFIG_FILL_KEY = "fill";
+    private static final String CONFIG_TITLE_KEY = "title";
+    private static final String CONFIG_SIZE_KEY = "size";
+    private static final int DEFAULT_GUI_SIZE = 45;
+
     public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin) {
-        // Carrega o arquivo de configuração emblemas_gui.yml
-        File configFile = new File(plugin.getDataFolder(), "emblemas_gui.yml");
-        if (!configFile.exists()) {
-            try {
-                configFile.createNewFile();
-                FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-                config.set("fill", Arrays.asList(0, 1, 3, 34, 35, 36, 37));
-                config.set("title", "Álbum de Emblemas");
-                config.set("size", "45");
-                config.save(configFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        FileConfiguration config = getConfig(plugin);
+        List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
+        Set<Integer> fillSet = new HashSet<>(fillSlots);
+
+        String unicodeTitle = config.getString(CONFIG_TITLE_KEY, "Álbum de Emblemas");
+        int guiSize = config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE);
+        
+        // Garante que o tamanho do inventário seja um múltiplo de 9 (requisito para inventários no Minecraft)
+        if (guiSize % 9 != 0) {
+            guiSize = DEFAULT_GUI_SIZE;
         }
-
-        // Carrega a configuração do arquivo
-        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-        List<Integer> fillSlots = config.getIntegerList("fill");
-        Set<Integer> fillSet = new HashSet<>(fillSlots); // Usamos um Set para busca rápida
-
-        // Cria o inventário do álbum
-        String unicodeTitle = config.getString("title");
-        int guiSize = config.getInt("size");
+        
         Inventory album = Bukkit.createInventory(null, guiSize, unicodeTitle);
 
-        int slot = 0; // Controle do slot em que o item será colocado
+        int slot = 0;
         for (Emblema emblema : emblemas) {
-            // Encontra o próximo slot que não esteja na lista de preenchimento
+
             while (fillSet.contains(slot)) {
                 slot++;
             }
 
-            // Cria o item do emblema
-            ItemStack item = new ItemStack(Material.DIAMOND);
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                meta.setCustomModelData(emblema.getCustomModelData());
-                meta.setDisplayName("§a" + emblema.getNome());
-                meta.setLore(Arrays.asList(
-                        LoreUtils.emblemaRaridade(emblema.getRaridade()),
-                        "",
-                        "§x§D§B§D§B§7§9" + emblema.getDescricaoRapida(),
-                        "",
-                        "§a» §fLançamento: §7" + emblema.getDataLancamento(),
-                        "§a» §fExclusividade: §7" + emblema.getLocalLancamento(),
-                        "§a» §fConquistável: §7" + emblema.getModoConquista(),
-                        "§a» §fPossuído por: §7200"));
-                item.setItemMeta(meta);
-            }
-
-            // Coloca o item no próximo slot disponível
-            album.setItem(slot, item);
-            slot++; // Avança para o próximo slot
+            album.setItem(slot, createEmblemaItem(emblema));
+            slot++;
         }
 
-        // Abre o inventário para o jogador
         player.openInventory(album);
+    }
+
+    private static FileConfiguration getConfig(JavaPlugin plugin) {
+        File configFile = new File(plugin.getDataFolder(), CONFIG_FILE_NAME);
+        if (!configFile.exists()) {
+            createDefaultConfig(configFile);
+        }
+        return YamlConfiguration.loadConfiguration(configFile);
+    }
+
+    private static void createDefaultConfig(File configFile) {
+        try {
+            configFile.createNewFile();
+            FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+            config.set(CONFIG_FILL_KEY, Arrays.asList(0, 1, 3, 34, 35, 36, 37));
+            config.set(CONFIG_TITLE_KEY, "Álbum de Emblemas");
+            config.set(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE);
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static ItemStack createEmblemaItem(Emblema emblema) {
+        ItemStack item = new ItemStack(Material.DIAMOND);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setCustomModelData(emblema.getCustomModelData());
+            meta.setDisplayName("§a" + emblema.getNome());
+            meta.setLore(Arrays.asList(
+                    LoreUtils.emblemaRaridade(emblema.getRaridade()),
+                    "",
+                    "§x§D§B§D§B§7§9" + emblema.getDescricaoRapida(),
+                    "",
+                    "§a» §fLançamento: §7" + emblema.getDataLancamento(),
+                    "§a» §fExclusividade: §7" + emblema.getLocalLancamento(),
+                    "§a» §fConquistável: §7" + emblema.getModoConquista(),
+                    "§a» §fPossuído por: §7200"));
+            item.setItemMeta(meta);
+        }
+        return item;
     }
 }
