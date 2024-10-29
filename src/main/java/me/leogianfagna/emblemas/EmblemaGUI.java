@@ -20,13 +20,15 @@ import java.util.Set;
 public class EmblemaGUI {
 
     public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin) {
-        // Carrega o arquivo de configuração EmblemaGUI.yml
-        File configFile = new File(plugin.getDataFolder(), "EmblemaGUI.yml");
+        // Carrega o arquivo de configuração emblemas_gui.yml
+        File configFile = new File(plugin.getDataFolder(), "emblemas_gui.yml");
         if (!configFile.exists()) {
             try {
                 configFile.createNewFile();
                 FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
                 config.set("fill", Arrays.asList(0, 1, 3, 34, 35, 36, 37));
+                config.set("title", "Álbum de Emblemas");
+                config.set("size", "45");
                 config.save(configFile);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -39,7 +41,9 @@ public class EmblemaGUI {
         Set<Integer> fillSet = new HashSet<>(fillSlots); // Usamos um Set para busca rápida
 
         // Cria o inventário do álbum
-        Inventory album = Bukkit.createInventory(null, 54, "Álbum de Emblemas");
+        String unicodeTitle = config.getString("title");
+        int guiSize = config.getInt("size");
+        Inventory album = Bukkit.createInventory(null, guiSize, unicodeTitle);
 
         int slot = 0; // Controle do slot em que o item será colocado
         for (Emblema emblema : emblemas) {
