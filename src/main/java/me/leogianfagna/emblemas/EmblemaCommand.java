@@ -20,7 +20,7 @@ public class EmblemaCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin);
+            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin, emblemaManager);
             return true;
         }
         return false;

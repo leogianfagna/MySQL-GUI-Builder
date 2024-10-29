@@ -31,7 +31,7 @@ public class AddEmblemaCommand implements CommandExecutor {
         // Verifica se a quantidade mínima de argumentos foi fornecida
         if (args.length < 10) {
             sender.sendMessage(
-                    "Uso incorreto! Use: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
+                    "Uso incorreto pois está com menos de 10 argumentos! Use: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
             return true;
         }
 
@@ -41,7 +41,7 @@ public class AddEmblemaCommand implements CommandExecutor {
 
         // Expressão regular para capturar texto entre aspas ou palavras isoladas
         Matcher matcher = Pattern.compile("\"([^\"]*)\"|(\\S+)").matcher(input);
-        while (matcher.find()) {
+        while (matcher.find() && argumentos.size() < 11) {
             if (matcher.group(1) != null) {
                 argumentos.add(matcher.group(1)); // Argumento entre aspas
             } else {
@@ -50,51 +50,61 @@ public class AddEmblemaCommand implements CommandExecutor {
         }
 
         // Verifica se todos os argumentos necessários foram fornecidos após o parse
-        if (argumentos.size() < 10) {
+        if (argumentos.size() < 11) {
             sender.sendMessage(
-                    "Uso incorreto! Use: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
+                    "Uso incorreto pois entrou no outro if que não sei o que significa! Use: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
             return true;
         }
 
         // Parseando os argumentos
         String nome = argumentos.get(0);
-        String categoria = argumentos.get(1);
+        String identificador = argumentos.get(1);
+        String categoria = argumentos.get(2);
         int idConquistado;
         int idNaoConquistado;
         try {
-            idConquistado = Integer.parseInt(argumentos.get(2));
-            idNaoConquistado = Integer.parseInt(argumentos.get(3));
+            idConquistado = Integer.parseInt(argumentos.get(3));
+            idNaoConquistado = Integer.parseInt(argumentos.get(4));
         } catch (NumberFormatException e) {
             sender.sendMessage("IDs devem ser números inteiros.");
             return true;
         }
-        String descricaoRapida = argumentos.get(4);
-        String descricaoCompleta = argumentos.get(5);
-        String raridade = argumentos.get(6);
-        String dataLancamento = argumentos.get(7);
-        String localLancamento = argumentos.get(8);
-        String modoConquista = argumentos.get(9);
+        String descricaoRapida = argumentos.get(5);
+        String descricaoCompleta = argumentos.get(6);
+        String raridade = argumentos.get(7);
+        String dataLancamento = argumentos.get(8);
+        String localLancamento = argumentos.get(9);
+        String modoConquista = argumentos.get(10);
+
+        sender.sendMessage("Argumentos processados com sucesso. Iniciando inserção no banco de dados.");
 
         // Inserindo no banco de dados
-        String sql = "INSERT INTO emblemas (nome, categoria, custom_conquistado, custom_black, descricao_rapida, descricao_completa, raridade, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO emblemas (nome, identificador, categoria, custom_conquistado, custom_black, descricao_rapida, descricao_completa, raridade, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, nome);
-            stmt.setString(2, categoria);
-            stmt.setInt(3, idConquistado);
-            stmt.setInt(4, idNaoConquistado);
-            stmt.setString(5, descricaoRapida);
-            stmt.setString(6, descricaoCompleta);
-            stmt.setString(7, raridade);
-            stmt.setString(8, dataLancamento);
-            stmt.setString(9, localLancamento);
-            stmt.setString(10, modoConquista);
-            stmt.executeUpdate();
-            sender.sendMessage("Emblema adicionado com sucesso!");
+            stmt.setString(2, identificador);
+            stmt.setString(3, categoria);
+            stmt.setInt(4, idConquistado);
+            stmt.setInt(5, idNaoConquistado);
+            stmt.setString(6, descricaoRapida);
+            stmt.setString(7, descricaoCompleta);
+            stmt.setString(8, raridade);
+            stmt.setString(9, dataLancamento);
+            stmt.setString(10, localLancamento);
+            stmt.setString(11, modoConquista);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                sender.sendMessage("Emblema adicionado com sucesso!");
+            } else {
+                sender.sendMessage("A inserção falhou, nenhuma linha foi afetada.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            sender.sendMessage("Erro ao adicionar o emblema. Verifique o console para mais detalhes.");
+            sender.sendMessage("Erro ao adicionar o emblema. Detalhes do erro: " + e.getMessage());
         }
 
+        sender.sendMessage("Finalizando execução do comando.");
         return true;
     }
 

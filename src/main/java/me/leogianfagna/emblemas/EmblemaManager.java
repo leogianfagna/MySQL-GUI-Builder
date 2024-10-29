@@ -3,6 +3,7 @@ package me.leogianfagna.emblemas;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class EmblemaManager {
 
@@ -29,7 +30,8 @@ public class EmblemaManager {
                     rs.getInt("raridade"),
                     rs.getString("data_lancamento"),
                     rs.getString("local_lancamento"),
-                    rs.getString("modo_conquista")
+                    rs.getString("modo_conquista"),
+                    rs.getString("identificador")
                 );
                 emblemas.add(emblema);
             }
@@ -37,6 +39,19 @@ public class EmblemaManager {
             e.printStackTrace();
         }
         return emblemas;
+    }
+
+    public boolean possuiEmblema(UUID playerUUID, String emblemaId) {
+        String query = "SELECT 1 FROM user_emblemas WHERE player_uuid = ? AND emblema_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, playerUUID.toString());
+            stmt.setString(2, emblemaId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next(); // Retorna true se houver um resultado, indicando que o emblema existe para o jogador
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
 

@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class EmblemaGUI {
 
@@ -25,10 +26,10 @@ public class EmblemaGUI {
     private static final String CONFIG_SIZE_KEY = "size";
     private static final int DEFAULT_GUI_SIZE = 45;
 
-    public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin) {
+    public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin, EmblemaManager emblemaManager) {
         FileConfiguration config = getConfig(plugin);
         List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
-        Set<Integer> fillSet = new HashSet<>(fillSlots);
+        Set<Integer> fillSet = new HashSet<>(fillSlots); // Usamos um Set para busca rápida
 
         String unicodeTitle = config.getString(CONFIG_TITLE_KEY, "Álbum de Emblemas");
         int guiSize = config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE);
@@ -39,15 +40,17 @@ public class EmblemaGUI {
         }
         
         Inventory album = Bukkit.createInventory(null, guiSize, unicodeTitle);
+        UUID playerUUID = player.getUniqueId();
 
         int slot = 0;
         for (Emblema emblema : emblemas) {
-
+            // Encontra o próximo slot que não esteja na lista de preenchimento
             while (fillSet.contains(slot)) {
                 slot++;
             }
 
-            album.setItem(slot, createEmblemaItem(emblema));
+            // Adiciona o emblema ao slot disponível
+            album.setItem(slot, createEmblemaItem(emblema, playerUUID, emblemaManager));
             slot++;
         }
 
@@ -75,11 +78,10 @@ public class EmblemaGUI {
         }
     }
 
-    private static ItemStack createEmblemaItem(Emblema emblema) {
+    private static ItemStack createEmblemaItem(Emblema emblema, UUID playerUUID, EmblemaManager emblemaManager) {
         ItemStack item = new ItemStack(Material.DIAMOND);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setCustomModelData(emblema.getCustomModelData());
             meta.setDisplayName("§a" + emblema.getNome());
             meta.setLore(Arrays.asList(
                     LoreUtils.emblemaRaridade(emblema.getRaridade()),
@@ -90,6 +92,14 @@ public class EmblemaGUI {
                     "§a» §fExclusividade: §7" + emblema.getLocalLancamento(),
                     "§a» §fConquistável: §7" + emblema.getModoConquista(),
                     "§a» §fPossuído por: §7200"));
+
+            // Verifica se o jogador possui o emblema
+            if (emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador())) {
+                meta.setCustomModelData(emblema.getCustomModelData());
+            } else {
+                meta.setCustomModelData(emblema.getCustomBlack());
+            }
+
             item.setItemMeta(meta);
         }
         return item;

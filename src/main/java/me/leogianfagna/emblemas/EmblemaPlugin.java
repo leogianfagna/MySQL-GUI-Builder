@@ -17,6 +17,7 @@ public class EmblemaPlugin extends JavaPlugin {
             emblemaManager = new EmblemaManager(connection);
             getCommand("album").setExecutor(new EmblemaCommand(emblemaManager, this));
             getCommand("entregaremblema").setExecutor(new EntregarEmblemaCommand(connection));
+            getCommand("addemblema").setExecutor(new AddEmblemaCommand(connection));
         } else {
             getLogger().severe("Falha ao conectar ao banco de dados. O plugin será desativado.");
             getServer().getPluginManager().disablePlugin(this);
@@ -51,6 +52,7 @@ public class EmblemaPlugin extends JavaPlugin {
             String emblemasListTableSql = "CREATE TABLE IF NOT EXISTS emblemas (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "nome VARCHAR(100), " +
+                    "identificador VARCHAR(100), " +
                     "categoria VARCHAR(20), " +
                     "custom_conquistado INT, " +
                     "custom_black INT, " +

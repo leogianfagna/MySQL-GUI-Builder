@@ -8,7 +8,7 @@ commands:
     usage: "/album"
   addemblema:
     description: Adiciona um novo emblema ao banco de dados.
-    usage: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <descrição rápida> <descrição completa> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>
+    usage: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <"descrição rápida"> <"descrição completa"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>
   entregaremblema:
     description: Entrega um emblema a um jogador.
     usage: /entregaremblema <nick> <emblema>

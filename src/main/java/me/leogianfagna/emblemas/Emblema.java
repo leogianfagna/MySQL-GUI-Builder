@@ -11,10 +11,11 @@ public class Emblema {
     private String dataLancamento;
     private String localLancamento;
     private String modoConquista;
+    private String identificador;
 
     public Emblema(String nome, String categoria, int idConquistado, int idNaoConquistado, String descricaoRapida,
             String descricaoCompleta, int raridade, String dataLancamento, String localLancamento,
-            String modoConquista) {
+            String modoConquista, String identificador) {
         this.nome = nome;
         this.categoria = categoria;
         this.idConquistado = idConquistado;
@@ -25,6 +26,7 @@ public class Emblema {
         this.dataLancamento = dataLancamento;
         this.localLancamento = localLancamento;
         this.modoConquista = modoConquista;
+        this.identificador = identificador;
     }
 
     public String getNome() {
@@ -39,7 +41,7 @@ public class Emblema {
         return this.idConquistado;
     }
 
-    public int getIdNaoConquistado() {
+    public int getCustomBlack() {
         return this.idNaoConquistado;
     }
 
@@ -65,5 +67,9 @@ public class Emblema {
 
     public String getModoConquista() {
         return this.modoConquista;
+    }
+
+    public String getIdentificador() {
+        return this.identificador;
     }
 }
