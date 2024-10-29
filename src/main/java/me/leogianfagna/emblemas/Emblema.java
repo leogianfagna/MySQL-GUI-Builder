@@ -7,13 +7,13 @@ public class Emblema {
     private int idNaoConquistado;
     private String descricaoRapida;
     private String descricaoCompleta;
-    private String raridade;
+    private int raridade;
     private String dataLancamento;
     private String localLancamento;
     private String modoConquista;
 
     public Emblema(String nome, String categoria, int idConquistado, int idNaoConquistado, String descricaoRapida,
-            String descricaoCompleta, String raridade, String dataLancamento, String localLancamento,
+            String descricaoCompleta, int raridade, String dataLancamento, String localLancamento,
             String modoConquista) {
         this.nome = nome;
         this.categoria = categoria;
@@ -51,7 +51,7 @@ public class Emblema {
         return this.descricaoCompleta;
     }
 
-    public String getRaridade() {
+    public int getRaridade() {
         return this.raridade;
     }
 

@@ -26,7 +26,7 @@ public class EmblemaManager {
                     rs.getInt("custom_black"),
                     rs.getString("descricao_rapida"),
                     rs.getString("descricao_completa"),
-                    rs.getString("raridade"),
+                    rs.getInt("raridade"),
                     rs.getString("data_lancamento"),
                     rs.getString("local_lancamento"),
                     rs.getString("modo_conquista")

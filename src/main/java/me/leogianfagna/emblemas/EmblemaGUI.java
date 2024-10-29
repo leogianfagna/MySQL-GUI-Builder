@@ -18,12 +18,16 @@ public class EmblemaGUI {
             ItemStack item = new ItemStack(Material.PAPER);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName(emblema.getNome());
+                meta.setDisplayName("§a" + emblema.getNome());
                 meta.setLore(Arrays.asList(
-                        "Categoria: " + emblema.getCategoria(),
-                        "Raridade: " + emblema.getRaridade(),
-                        "Data de Lançamento: " + emblema.getDataLancamento(),
-                        "Modo de Conquista: " + emblema.getModoConquista()));
+                        LoreUtils.emblemaRaridade(emblema.getRaridade()),        
+                        "",
+                        "§x§D§B§D§B§7§9" + emblema.getDescricaoRapida(),
+                        "",
+                        "§a» §fLançamento: §7" + emblema.getDataLancamento(),
+                        "§a» §fExclusividade: §7" + emblema.getLocalLancamento(),
+                        "§a» §fConquistável: §7" + emblema.getModoConquista(),
+                        "§a» §fPossuído por: §7200"));
                 item.setItemMeta(meta);
             }
             album.addItem(item);
