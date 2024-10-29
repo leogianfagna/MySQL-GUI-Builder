@@ -13,13 +13,10 @@ public class EmblemaPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        
-        // Conecta ao banco de dados e inicializa o EmblemaManager
         if (connectToDatabase()) {
             emblemaManager = new EmblemaManager(connection);
             getCommand("album").setExecutor(new EmblemaCommand(emblemaManager, this));
-            getCommand("addemblema").setExecutor(new AddEmblemaCommand(connection));
-            getLogger().info("Plugin Emblema habilitado com sucesso.");
+            getCommand("entregaremblema").setExecutor(new EntregarEmblemaCommand(connection));
         } else {
             getLogger().severe("Falha ao conectar ao banco de dados. O plugin será desativado.");
             getServer().getPluginManager().disablePlugin(this);
@@ -43,16 +40,15 @@ public class EmblemaPlugin extends JavaPlugin {
         String database = getConfig().getString("mysql.database");
         String user = getConfig().getString("mysql.username");
         String password = getConfig().getString("mysql.password");
-        
+
         // Inclui o parâmetro de SSL falso
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
-    
+
         try {
             connection = DriverManager.getConnection(url, user, password);
             getLogger().info("Conectado ao banco de dados MySQL com sucesso!");
-    
-            // Exemplo de criação de tabela para o novo plugin, ajuste conforme necessário
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS emblemas (" +
+
+            String emblemasListTableSql = "CREATE TABLE IF NOT EXISTS emblemas (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "nome VARCHAR(100), " +
                     "categoria VARCHAR(20), " +
@@ -65,8 +61,17 @@ public class EmblemaPlugin extends JavaPlugin {
                     "local_lancamento VARCHAR(50), " +
                     "modo_conquista VARCHAR(50) " +
                     ")";
-            connection.prepareStatement(createTableSQL).executeUpdate();
-            
+
+            String donosListTableSql = "CREATE TABLE IF NOT EXISTS user_emblemas (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "player_uuid CHAR(36), " +
+                    "emblema_id VARCHAR(50), " +
+                    "UNIQUE (player_uuid, emblema_id) " +
+                    ")";
+
+            connection.prepareStatement(emblemasListTableSql).executeUpdate();
+            connection.prepareStatement(donosListTableSql).executeUpdate();
+
             return true;
         } catch (SQLException e) {
             getLogger().severe("Falha ao conectar ao banco de dados: " + e.getMessage());
@@ -74,8 +79,6 @@ public class EmblemaPlugin extends JavaPlugin {
             return false;
         }
     }
-    
-    
 
     public Connection getConnection() {
         return connection;
