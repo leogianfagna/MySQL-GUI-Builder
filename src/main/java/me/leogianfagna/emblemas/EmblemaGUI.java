@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,19 +27,21 @@ public class EmblemaGUI {
     private static final String CONFIG_SIZE_KEY = "size";
     private static final int DEFAULT_GUI_SIZE = 45;
 
-    public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin, EmblemaManager emblemaManager) {
+    public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin,
+            EmblemaManager emblemaManager) {
         FileConfiguration config = getConfig(plugin);
         List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
         Set<Integer> fillSet = new HashSet<>(fillSlots); // Usamos um Set para busca rápida
 
         String unicodeTitle = config.getString(CONFIG_TITLE_KEY, "Álbum de Emblemas");
         int guiSize = config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE);
-        
-        // Garante que o tamanho do inventário seja um múltiplo de 9 (requisito para inventários no Minecraft)
+
+        // Garante que o tamanho do inventário seja um múltiplo de 9 (requisito para
+        // inventários no Minecraft)
         if (guiSize % 9 != 0) {
             guiSize = DEFAULT_GUI_SIZE;
         }
-        
+
         Inventory album = Bukkit.createInventory(null, guiSize, unicodeTitle);
         UUID playerUUID = player.getUniqueId();
 
@@ -83,25 +86,31 @@ public class EmblemaGUI {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName("§a" + emblema.getNome());
-            meta.setLore(Arrays.asList(
-                    LoreUtils.emblemaRaridade(emblema.getRaridade()),
-                    "",
-                    "§x§D§B§D§B§7§9" + emblema.getDescricaoRapida(),
-                    "",
-                    "§a» §fLançamento: §7" + emblema.getDataLancamento(),
-                    "§a» §fExclusividade: §7" + emblema.getLocalLancamento(),
-                    "§a» §fConquistável: §7" + emblema.getModoConquista(),
-                    "§a» §fPossuído por: §7" + emblemaManager.contarPossuidoresEmblema(emblema.getIdentificador())));
 
-            // Verifica se o jogador possui o emblema
+            // Cria uma lista para a lore
+            List<String> lore = new ArrayList<>();
+            lore.add(LoreUtils.emblemaRaridade(emblema.getRaridade()));
+            lore.add("");
+            lore.add("§x§D§B§D§B§7§9" + emblema.getDescricaoRapida());
+            lore.add("");
+            lore.add("§a» §fLançamento: §7" + emblema.getDataLancamento());
+            lore.add("§a» §fExclusividade: §7" + emblema.getLocalLancamento());
+            lore.add("§a» §fConquistável: §7" + emblema.getModoConquista());
+            lore.add("§a» §fPossuído por: §7" + emblemaManager.contarPossuidoresEmblema(emblema.getIdentificador()));
+
+            // Condições de pertencimento
             if (emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador())) {
                 meta.setCustomModelData(emblema.getCustomModelData());
             } else {
+                lore.add("");
+                lore.add("§8" + emblema.getDescricaoCompleta());
                 meta.setCustomModelData(emblema.getCustomBlack());
             }
 
+            meta.setLore(lore);
             item.setItemMeta(meta);
         }
         return item;
     }
+
 }
