@@ -35,7 +35,7 @@ public class Emblema {
         return this.categoria;
     }
 
-    public int getIdConquistado() {
+    public int getCustomModelData() {
         return this.idConquistado;
     }
 

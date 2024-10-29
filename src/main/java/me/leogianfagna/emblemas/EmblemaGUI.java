@@ -15,9 +15,10 @@ public class EmblemaGUI {
     public static void openAlbum(Player player, List<Emblema> emblemas) {
         Inventory album = Bukkit.createInventory(null, 54, "Álbum de Emblemas");
         for (Emblema emblema : emblemas) {
-            ItemStack item = new ItemStack(Material.PAPER);
+            ItemStack item = new ItemStack(Material.DIAMOND);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
+                meta.setCustomModelData(emblema.getCustomModelData());
                 meta.setDisplayName("§a" + emblema.getNome());
                 meta.setLore(Arrays.asList(
                         LoreUtils.emblemaRaridade(emblema.getRaridade()),        
