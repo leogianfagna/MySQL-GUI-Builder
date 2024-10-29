@@ -1,0 +1,11 @@
+main: me.leogianfagna.emblemas.EmblemaPlugin
+name: EmblemasAustv
+version: 1.0
+api-version: "1.20"
+commands:
+  album:
+    description: "Abre o álbum de emblemas."
+    usage: "/album"
+  addemblema:
+    description: Adiciona um novo emblema ao banco de dados.
+    usage: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <descrição rápida> <descrição completa> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>

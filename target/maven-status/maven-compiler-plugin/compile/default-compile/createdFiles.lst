@@ -1,0 +1,6 @@
+net\austv\emblemas\AddEmblemaCommand.class
+net\austv\emblemas\EmblemaGUI.class
+net\austv\emblemas\EmblemaManager.class
+net\austv\emblemas\EmblemaCommand.class
+net\austv\emblemas\Emblema.class
+net\austv\emblemas\EmblemaPlugin.class
