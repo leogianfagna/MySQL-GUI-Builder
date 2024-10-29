@@ -8,6 +8,10 @@ import org.bukkit.entity.Player;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AddEmblemaCommand implements CommandExecutor {
 
@@ -24,30 +28,52 @@ public class AddEmblemaCommand implements CommandExecutor {
             return true;
         }
 
+        // Verifica se a quantidade mínima de argumentos foi fornecida
         if (args.length < 10) {
             sender.sendMessage(
-                    "Uso incorreto! Use: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <descrição rápida> <descrição completa> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
+                    "Uso incorreto! Use: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
+            return true;
+        }
+
+        // Combina todos os argumentos em uma única string para facilitar a análise
+        String input = String.join(" ", args);
+        List<String> argumentos = new ArrayList<>();
+
+        // Expressão regular para capturar texto entre aspas ou palavras isoladas
+        Matcher matcher = Pattern.compile("\"([^\"]*)\"|(\\S+)").matcher(input);
+        while (matcher.find()) {
+            if (matcher.group(1) != null) {
+                argumentos.add(matcher.group(1)); // Argumento entre aspas
+            } else {
+                argumentos.add(matcher.group(2)); // Argumento sem aspas
+            }
+        }
+
+        // Verifica se todos os argumentos necessários foram fornecidos após o parse
+        if (argumentos.size() < 10) {
+            sender.sendMessage(
+                    "Uso incorreto! Use: /addemblema <nome> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
             return true;
         }
 
         // Parseando os argumentos
-        String nome = args[0];
-        String categoria = args[1];
+        String nome = argumentos.get(0);
+        String categoria = argumentos.get(1);
         int idConquistado;
         int idNaoConquistado;
         try {
-            idConquistado = Integer.parseInt(args[2]);
-            idNaoConquistado = Integer.parseInt(args[3]);
+            idConquistado = Integer.parseInt(argumentos.get(2));
+            idNaoConquistado = Integer.parseInt(argumentos.get(3));
         } catch (NumberFormatException e) {
             sender.sendMessage("IDs devem ser números inteiros.");
             return true;
         }
-        String descricaoRapida = args[4];
-        String descricaoCompleta = args[5];
-        String raridade = args[6];
-        String dataLancamento = args[7];
-        String localLancamento = args[8];
-        String modoConquista = args[9];
+        String descricaoRapida = argumentos.get(4);
+        String descricaoCompleta = argumentos.get(5);
+        String raridade = argumentos.get(6);
+        String dataLancamento = argumentos.get(7);
+        String localLancamento = argumentos.get(8);
+        String modoConquista = argumentos.get(9);
 
         // Inserindo no banco de dados
         String sql = "INSERT INTO emblemas (nome, categoria, custom_conquistado, custom_black, descricao_rapida, descricao_completa, raridade, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -71,4 +97,5 @@ public class AddEmblemaCommand implements CommandExecutor {
 
         return true;
     }
+
 }
