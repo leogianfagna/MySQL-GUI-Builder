@@ -17,7 +17,7 @@ public class EmblemaPlugin extends JavaPlugin {
         // Conecta ao banco de dados e inicializa o EmblemaManager
         if (connectToDatabase()) {
             emblemaManager = new EmblemaManager(connection);
-            getCommand("album").setExecutor(new EmblemaCommand(emblemaManager));
+            getCommand("album").setExecutor(new EmblemaCommand(emblemaManager, this));
             getCommand("addemblema").setExecutor(new AddEmblemaCommand(connection));
             getLogger().info("Plugin Emblema habilitado com sucesso.");
         } else {
