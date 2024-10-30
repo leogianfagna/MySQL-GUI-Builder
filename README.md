@@ -6,8 +6,7 @@
 
 
 ## O que falta
-1. Organização por categorias
-2. Paginação
-3. Ícone de voltar ao menu principal
-4. Improve: não precisa do nome da categoria, dá para filtrar usando a raridade!
-5. Só! :)
+1. Paginação
+2. Improve: não precisa do nome da categoria, dá para filtrar usando a raridade!
+3. Javadocs
+4. Só! :)

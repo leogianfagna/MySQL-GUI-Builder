@@ -1,5 +1,15 @@
 title: '§f'
 size: 45
+next-page:
+  42: "/shop reload"
+  43: "/effect give WaKaliTe minecraft:absorption 3 9"
+previous-page:
+  37: "/shop reload"
+  38: "/effect give WaKaliTe minecraft:absorption 3 9"
+back:
+  39: "/shop emblemas"
+  40: "/shop emblemas"
+  41: "/shop emblemas"
 fill:
 - 0
 - 8

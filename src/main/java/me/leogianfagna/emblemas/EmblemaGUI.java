@@ -21,6 +21,9 @@ import java.util.UUID;
 
 public class EmblemaGUI {
 
+    private static final String NEXT_BUTTON_KEY = "next-page";
+    private static final String PREVIOUS_BUTTON_KEY = "previous-page";
+    private static final String MENU_TESTE_KEY = "back";
     private static final String CONFIG_FILE_NAME = "emblemas_gui.yml";
     private static final String CONFIG_FILL_KEY = "fill";
     private static final String CONFIG_TITLE_KEY = "title";
@@ -31,13 +34,11 @@ public class EmblemaGUI {
             EmblemaManager emblemaManager, int raridadeFiltro) {
         FileConfiguration config = getConfig(plugin);
         List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
-        Set<Integer> fillSet = new HashSet<>(fillSlots); // Usamos um Set para busca rápida
+        Set<Integer> fillSet = new HashSet<>(fillSlots);
 
         String unicodeTitle = config.getString(CONFIG_TITLE_KEY, "Álbum de Emblemas");
         int guiSize = config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE);
 
-        // Garante que o tamanho do inventário seja um múltiplo de 9 (requisito para
-        // inventários no Minecraft)
         if (guiSize % 9 != 0) {
             guiSize = DEFAULT_GUI_SIZE;
         }
@@ -45,22 +46,64 @@ public class EmblemaGUI {
         Inventory album = Bukkit.createInventory(null, guiSize, unicodeTitle);
         UUID playerUUID = player.getUniqueId();
 
+        // Configura os botões
+        Set<String> buttonKeys = config.getConfigurationSection(NEXT_BUTTON_KEY).getKeys(false);
+        for (String key : buttonKeys) {
+            int slotBotao = Integer.parseInt(key);
+
+            ItemStack itemBotao = new ItemStack(Material.JIGSAW);
+            ItemMeta meta = itemBotao.getItemMeta();
+            meta.setDisplayName("§7Próxima página §a»");
+            itemBotao.setItemMeta(meta);
+
+            album.setItem(slotBotao, itemBotao);
+            fillSet.add(slotBotao);
+        }
+
+        Set<String> buttonKeys2 = config.getConfigurationSection(PREVIOUS_BUTTON_KEY).getKeys(false);
+        for (String key : buttonKeys2) {
+            int slotBotao = Integer.parseInt(key);
+
+            ItemStack itemBotao = new ItemStack(Material.JIGSAW);
+            ItemMeta meta = itemBotao.getItemMeta();
+            meta.setDisplayName("§c« §7Página anterior");
+            itemBotao.setItemMeta(meta);
+
+            album.setItem(slotBotao, itemBotao);
+            fillSet.add(slotBotao);
+        }
+
+        Set<String> buttonKeys3 = config.getConfigurationSection(MENU_TESTE_KEY).getKeys(false);
+        for (String key : buttonKeys3) {
+            int slotBotao = Integer.parseInt(key);
+
+            ItemStack itemBotao = new ItemStack(Material.JIGSAW);
+            ItemMeta meta = itemBotao.getItemMeta();
+            meta.setDisplayName("§7Voltar");
+            itemBotao.setItemMeta(meta);
+
+            album.setItem(slotBotao, itemBotao);
+            fillSet.add(slotBotao);
+        }
+
+        // Preenche os emblemas ignorando os slots de botões
         int slot = 0;
         for (Emblema emblema : emblemas) {
+            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro)
+                continue;
 
-            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro) continue;
-
-            // Encontra o próximo slot que não esteja na lista de preenchimento
             while (fillSet.contains(slot)) {
                 slot++;
             }
 
-            // Adiciona o emblema ao slot disponível
             album.setItem(slot, createEmblemaItem(emblema, playerUUID, emblemaManager));
             slot++;
         }
 
         player.openInventory(album);
+
+        // Registra o listener para clique nos botões
+        Bukkit.getPluginManager().registerEvents(new AlbumMenuListener(album, config), plugin);
     }
 
     private static FileConfiguration getConfig(JavaPlugin plugin) {
@@ -114,6 +157,9 @@ public class EmblemaGUI {
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    private static void fillMenuButtons(List<Integer> menuSlots) {
     }
 
 }
