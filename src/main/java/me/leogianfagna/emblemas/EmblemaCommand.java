@@ -20,10 +20,23 @@ public class EmblemaCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin, emblemaManager);
+            int raridadeFiltro = 0; // padrão, exibe todos
+
+            // Se o argumento de raridade foi fornecido, tenta interpretá-lo como número
+            if (args.length > 0) {
+                try {
+                    raridadeFiltro = Integer.parseInt(args[0]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage("Por favor, insira um número válido para a raridade.");
+                    return true;
+                }
+            }
+
+            // Passa a raridade como argumento para o método openAlbum
+            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin, emblemaManager, raridadeFiltro);
             return true;
         }
         return false;
     }
-}
 
+}

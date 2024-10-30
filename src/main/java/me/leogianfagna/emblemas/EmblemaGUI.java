@@ -28,7 +28,7 @@ public class EmblemaGUI {
     private static final int DEFAULT_GUI_SIZE = 45;
 
     public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin,
-            EmblemaManager emblemaManager) {
+            EmblemaManager emblemaManager, int raridadeFiltro) {
         FileConfiguration config = getConfig(plugin);
         List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
         Set<Integer> fillSet = new HashSet<>(fillSlots); // Usamos um Set para busca rápida
@@ -47,6 +47,9 @@ public class EmblemaGUI {
 
         int slot = 0;
         for (Emblema emblema : emblemas) {
+
+            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro) continue;
+
             // Encontra o próximo slot que não esteja na lista de preenchimento
             while (fillSet.contains(slot)) {
                 slot++;
