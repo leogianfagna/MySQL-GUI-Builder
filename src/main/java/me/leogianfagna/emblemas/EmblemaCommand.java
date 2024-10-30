@@ -21,7 +21,8 @@ public class EmblemaCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             int raridadeFiltro = 0; // padrão, exibe todos
-
+            int pagina = 1; // página padrão
+    
             // Se o argumento de raridade foi fornecido, tenta interpretá-lo como número
             if (args.length > 0) {
                 try {
@@ -31,12 +32,27 @@ public class EmblemaCommand implements CommandExecutor {
                     return true;
                 }
             }
-
-            // Passa a raridade como argumento para o método openAlbum
-            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin, emblemaManager, raridadeFiltro);
+    
+            // Se o argumento de página foi fornecido, tenta interpretá-lo como número
+            if (args.length > 1) {
+                try {
+                    pagina = Integer.parseInt(args[1]);
+                    if (pagina < 1) {
+                        player.sendMessage("O número da página deve ser maior ou igual a 1.");
+                        return true;
+                    }
+                } catch (NumberFormatException e) {
+                    player.sendMessage("Por favor, insira um número válido para a página.");
+                    return true;
+                }
+            }
+    
+            // Passa a raridade e a página como argumentos para o método openAlbum
+            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin, emblemaManager, raridadeFiltro, pagina);
             return true;
         }
         return false;
     }
+    
 
 }

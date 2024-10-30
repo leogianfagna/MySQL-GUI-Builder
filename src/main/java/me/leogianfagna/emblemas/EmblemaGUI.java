@@ -31,7 +31,7 @@ public class EmblemaGUI {
     private static final int DEFAULT_GUI_SIZE = 45;
 
     public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin,
-            EmblemaManager emblemaManager, int raridadeFiltro) {
+            EmblemaManager emblemaManager, int raridadeFiltro, int pagina) {
         FileConfiguration config = getConfig(plugin);
         List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
         Set<Integer> fillSet = new HashSet<>(fillSlots);
@@ -88,10 +88,21 @@ public class EmblemaGUI {
 
         // Preenche os emblemas ignorando os slots de botões
         int slot = 0;
-        for (Emblema emblema : emblemas) {
-            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro)
-                continue;
+        int paginaAtual = pagina;
+        int maxEmblemasPag = 28;
 
+        int primeiroElemento = (paginaAtual - 1) * maxEmblemasPag;
+        int ultimoElemento = Math.min(primeiroElemento + maxEmblemasPag, emblemas.size());
+
+        for (int contador = primeiroElemento; contador < ultimoElemento; contador++) {
+            Emblema emblema = emblemas.get(contador);
+
+            // Filtra por raridade, se necessário
+            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro) {
+                continue;
+            }
+
+            // Ignora slots reservados em fillSet
             while (fillSet.contains(slot)) {
                 slot++;
             }
@@ -103,7 +114,7 @@ public class EmblemaGUI {
         player.openInventory(album);
 
         // Registra o listener para clique nos botões
-        Bukkit.getPluginManager().registerEvents(new AlbumMenuListener(album, config), plugin);
+        Bukkit.getPluginManager().registerEvents(new AlbumMenuListener(album, config, raridadeFiltro, pagina), plugin);
     }
 
     private static FileConfiguration getConfig(JavaPlugin plugin) {
