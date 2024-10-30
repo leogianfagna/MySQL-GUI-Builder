@@ -12,12 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class EmblemaGUI {
 
@@ -29,91 +24,26 @@ public class EmblemaGUI {
     private static final String CONFIG_TITLE_KEY = "title";
     private static final String CONFIG_SIZE_KEY = "size";
     private static final int DEFAULT_GUI_SIZE = 45;
+    private static final int MAX_EMBLEMAS_PER_PAGE = 28;
 
     public static void openAlbum(Player player, List<Emblema> emblemas, JavaPlugin plugin,
-            EmblemaManager emblemaManager, int raridadeFiltro, int pagina) {
+                                 EmblemaManager emblemaManager, int raridadeFiltro, int pagina) {
         FileConfiguration config = getConfig(plugin);
-        List<Integer> fillSlots = config.getIntegerList(CONFIG_FILL_KEY);
-        Set<Integer> fillSet = new HashSet<>(fillSlots);
+        Set<Integer> fillSet = new HashSet<>(config.getIntegerList(CONFIG_FILL_KEY));
+        String title = config.getString(CONFIG_TITLE_KEY, "Álbum de Emblemas");
+        int guiSize = validateGuiSize(config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE));
 
-        String unicodeTitle = config.getString(CONFIG_TITLE_KEY, "Álbum de Emblemas");
-        int guiSize = config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE);
-
-        if (guiSize % 9 != 0) {
-            guiSize = DEFAULT_GUI_SIZE;
-        }
-
-        Inventory album = Bukkit.createInventory(null, guiSize, unicodeTitle);
+        Inventory album = Bukkit.createInventory(null, guiSize, title);
         UUID playerUUID = player.getUniqueId();
 
-        // Configura os botões
-        Set<String> buttonKeys = config.getConfigurationSection(NEXT_BUTTON_KEY).getKeys(false);
-        for (String key : buttonKeys) {
-            int slotBotao = Integer.parseInt(key);
+        // Configura botões de navegação
+        configureNavigationButtons(album, config, fillSet);
 
-            ItemStack itemBotao = new ItemStack(Material.JIGSAW);
-            ItemMeta meta = itemBotao.getItemMeta();
-            meta.setDisplayName("§7Próxima página §a»");
-            itemBotao.setItemMeta(meta);
+        // Preenche os emblemas, ignorando slots de preenchimento e botões
+        fillEmblemasInAlbum(album, emblemas, emblemaManager, fillSet, raridadeFiltro, pagina, playerUUID);
 
-            album.setItem(slotBotao, itemBotao);
-            fillSet.add(slotBotao);
-        }
-
-        Set<String> buttonKeys2 = config.getConfigurationSection(PREVIOUS_BUTTON_KEY).getKeys(false);
-        for (String key : buttonKeys2) {
-            int slotBotao = Integer.parseInt(key);
-
-            ItemStack itemBotao = new ItemStack(Material.JIGSAW);
-            ItemMeta meta = itemBotao.getItemMeta();
-            meta.setDisplayName("§c« §7Página anterior");
-            itemBotao.setItemMeta(meta);
-
-            album.setItem(slotBotao, itemBotao);
-            fillSet.add(slotBotao);
-        }
-
-        Set<String> buttonKeys3 = config.getConfigurationSection(MENU_TESTE_KEY).getKeys(false);
-        for (String key : buttonKeys3) {
-            int slotBotao = Integer.parseInt(key);
-
-            ItemStack itemBotao = new ItemStack(Material.JIGSAW);
-            ItemMeta meta = itemBotao.getItemMeta();
-            meta.setDisplayName("§7Voltar");
-            itemBotao.setItemMeta(meta);
-
-            album.setItem(slotBotao, itemBotao);
-            fillSet.add(slotBotao);
-        }
-
-        // Preenche os emblemas ignorando os slots de botões
-        int slot = 0;
-        int paginaAtual = pagina;
-        int maxEmblemasPag = 28;
-
-        int primeiroElemento = (paginaAtual - 1) * maxEmblemasPag;
-        int ultimoElemento = Math.min(primeiroElemento + maxEmblemasPag, emblemas.size());
-
-        for (int contador = primeiroElemento; contador < ultimoElemento; contador++) {
-            Emblema emblema = emblemas.get(contador);
-
-            // Filtra por raridade, se necessário
-            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro) {
-                continue;
-            }
-
-            // Ignora slots reservados em fillSet
-            while (fillSet.contains(slot)) {
-                slot++;
-            }
-
-            album.setItem(slot, createEmblemaItem(emblema, playerUUID, emblemaManager));
-            slot++;
-        }
-
+        // Abre o inventário e registra o listener para cliques
         player.openInventory(album);
-
-        // Registra o listener para clique nos botões
         Bukkit.getPluginManager().registerEvents(new AlbumMenuListener(album, config, raridadeFiltro, pagina), plugin);
     }
 
@@ -138,39 +68,82 @@ public class EmblemaGUI {
         }
     }
 
+    private static int validateGuiSize(int guiSize) {
+        return (guiSize % 9 == 0) ? guiSize : DEFAULT_GUI_SIZE;
+    }
+
+    private static void configureNavigationButtons(Inventory album, FileConfiguration config, Set<Integer> fillSet) {
+        setupButton(album, config, NEXT_BUTTON_KEY, Material.JIGSAW, "§7Próxima página §a»", fillSet);
+        setupButton(album, config, PREVIOUS_BUTTON_KEY, Material.JIGSAW, "§c« §7Página anterior", fillSet);
+        setupButton(album, config, MENU_TESTE_KEY, Material.JIGSAW, "§7Voltar", fillSet);
+    }
+
+    private static void setupButton(Inventory album, FileConfiguration config, String key, Material material,
+                                    String displayName, Set<Integer> fillSet) {
+        Set<String> buttonKeys = config.getConfigurationSection(key).getKeys(false);
+        for (String buttonKey : buttonKeys) {
+            int slot = Integer.parseInt(buttonKey);
+            ItemStack button = new ItemStack(material);
+            ItemMeta meta = button.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(displayName);
+                button.setItemMeta(meta);
+            }
+            album.setItem(slot, button);
+            fillSet.add(slot);
+        }
+    }
+
+    private static void fillEmblemasInAlbum(Inventory album, List<Emblema> emblemas, EmblemaManager emblemaManager,
+                                            Set<Integer> fillSet, int raridadeFiltro, int pagina, UUID playerUUID) {
+        int start = (pagina - 1) * MAX_EMBLEMAS_PER_PAGE;
+        int end = Math.min(start + MAX_EMBLEMAS_PER_PAGE, emblemas.size());
+        int slot = 0;
+
+        for (int i = start; i < end; i++) {
+            Emblema emblema = emblemas.get(i);
+
+            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro) {
+                continue;
+            }
+
+            while (fillSet.contains(slot)) {
+                slot++;
+            }
+
+            album.setItem(slot, createEmblemaItem(emblema, playerUUID, emblemaManager));
+            slot++;
+        }
+    }
+
     private static ItemStack createEmblemaItem(Emblema emblema, UUID playerUUID, EmblemaManager emblemaManager) {
         ItemStack item = new ItemStack(Material.DIAMOND);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName("§a" + emblema.getNome());
-
-            // Cria uma lista para a lore
-            List<String> lore = new ArrayList<>();
-            lore.add(LoreUtils.emblemaRaridade(emblema.getRaridade()));
-            lore.add("");
-            lore.add("§x§D§B§D§B§7§9" + emblema.getDescricaoRapida());
-            lore.add("");
-            lore.add("§a» §fLançamento: §7" + emblema.getDataLancamento());
-            lore.add("§a» §fExclusividade: §7" + emblema.getLocalLancamento());
-            lore.add("§a» §fConquistável: §7" + emblema.getModoConquista());
-            lore.add("§a» §fPossuído por: §7" + emblemaManager.contarPossuidoresEmblema(emblema.getIdentificador()));
-
-            // Condições de pertencimento
-            if (emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador())) {
-                meta.setCustomModelData(emblema.getCustomModelData());
-            } else {
-                lore.add("");
-                lore.add("§8" + emblema.getDescricaoCompleta());
-                meta.setCustomModelData(emblema.getCustomBlack());
-            }
-
-            meta.setLore(lore);
+            meta.setLore(createLore(emblema, playerUUID, emblemaManager));
+            meta.setCustomModelData(emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador()) ?
+                                    emblema.getCustomModelData() : emblema.getCustomBlack());
             item.setItemMeta(meta);
         }
         return item;
     }
 
-    private static void fillMenuButtons(List<Integer> menuSlots) {
-    }
+    private static List<String> createLore(Emblema emblema, UUID playerUUID, EmblemaManager emblemaManager) {
+        List<String> lore = new ArrayList<>();
+        lore.add(LoreUtils.emblemaRaridade(emblema.getRaridade()));
+        lore.add("");
+        lore.add("§x§D§B§D§B§7§9" + emblema.getDescricaoRapida());
+        lore.add("");
+        lore.add("§a» §fLançamento: §7" + emblema.getDataLancamento());
+        lore.add("§a» §fExclusividade: §7" + emblema.getLocalLancamento());
+        lore.add("§a» §fConquistável: §7" + emblema.getModoConquista());
+        lore.add("§a» §fPossuído por: §7" + emblemaManager.contarPossuidoresEmblema(emblema.getIdentificador()));
 
+        if (!emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador())) {
+            lore.add("");
+            lore.add("§8" + emblema.getDescricaoCompleta());
+        }
+        return lore;
+    }
 }
