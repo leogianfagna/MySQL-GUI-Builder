@@ -13,12 +13,14 @@ public class EmblemaManager {
         this.connection = connection;
     }
 
-    public List<Emblema> getEmblemas() {
+    public List<Emblema> getEmblemas(int categoria) {
         List<Emblema> emblemas = new ArrayList<>();
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM emblemas");
-
+        String query = "SELECT * FROM emblemas WHERE raridade = ?";
+        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, categoria); // Define o parâmetro "categoria"
+            
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Emblema emblema = new Emblema(
                     rs.getString("nome"),
@@ -40,6 +42,7 @@ public class EmblemaManager {
         }
         return emblemas;
     }
+    
 
     public boolean possuiEmblema(UUID playerUUID, String emblemaId) {
         String query = "SELECT 1 FROM user_emblemas WHERE player_uuid = ? AND emblema_id = ?";

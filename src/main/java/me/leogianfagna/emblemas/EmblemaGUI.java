@@ -103,10 +103,6 @@ public class EmblemaGUI {
         for (int i = start; i < end; i++) {
             Emblema emblema = emblemas.get(i);
 
-            if (raridadeFiltro > 0 && emblema.getRaridade() != raridadeFiltro) {
-                continue;
-            }
-
             while (fillSet.contains(slot)) {
                 slot++;
             }

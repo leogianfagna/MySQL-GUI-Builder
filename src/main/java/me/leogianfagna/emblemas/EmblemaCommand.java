@@ -48,7 +48,7 @@ public class EmblemaCommand implements CommandExecutor {
             }
     
             // Passa a raridade e a página como argumentos para o método openAlbum
-            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(), plugin, emblemaManager, raridadeFiltro, pagina);
+            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(raridadeFiltro), plugin, emblemaManager, raridadeFiltro, pagina);
             return true;
         }
         return false;
