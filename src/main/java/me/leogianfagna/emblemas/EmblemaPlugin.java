@@ -1,5 +1,6 @@
 package me.leogianfagna.emblemas;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,6 +19,10 @@ public class EmblemaPlugin extends JavaPlugin {
             getCommand("album").setExecutor(new EmblemaCommand(emblemaManager, this));
             getCommand("entregaremblema").setExecutor(new EntregarEmblemaCommand(connection));
             getCommand("addemblema").setExecutor(new AddEmblemaCommand(connection));
+
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                new EmblemaPlaceholderExpansion(connection, this).register();
+            }
         } else {
             getLogger().severe("Falha ao conectar ao banco de dados. O plugin será desativado.");
             getServer().getPluginManager().disablePlugin(this);

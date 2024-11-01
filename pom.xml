@@ -46,8 +46,8 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>essentials-repo</id>
-            <url>https://repo.essentialsx.net/releases/</url>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
     </repositories>
 
@@ -65,10 +65,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <!-- https://mvnrepository.com/artifact/net.ess3/EssentialsX/2.18.2 -->
-            <groupId>net.ess3</groupId>
-            <artifactId>EssentialsX</artifactId>
-            <version>2.18.2</version>
+            <!-- https://wiki.placeholderapi.com/developers/using-placeholderapi/ -->
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
