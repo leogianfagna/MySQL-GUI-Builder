@@ -24,12 +24,11 @@ public class EmblemaManager {
             while (rs.next()) {
                 Emblema emblema = new Emblema(
                     rs.getString("nome"),
-                    rs.getString("categoria"),
+                    rs.getInt("raridade"),
                     rs.getInt("custom_conquistado"),
                     rs.getInt("custom_black"),
                     rs.getString("descricao_rapida"),
                     rs.getString("descricao_completa"),
-                    rs.getInt("raridade"),
                     rs.getString("data_lancamento"),
                     rs.getString("local_lancamento"),
                     rs.getString("modo_conquista"),

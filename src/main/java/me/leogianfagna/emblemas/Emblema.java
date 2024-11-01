@@ -2,7 +2,6 @@ package me.leogianfagna.emblemas;
 
 public class Emblema {
     private String nome;
-    private String categoria;
     private int idConquistado;
     private int idNaoConquistado;
     private String descricaoRapida;
@@ -13,11 +12,10 @@ public class Emblema {
     private String modoConquista;
     private String identificador;
 
-    public Emblema(String nome, String categoria, int idConquistado, int idNaoConquistado, String descricaoRapida,
-            String descricaoCompleta, int raridade, String dataLancamento, String localLancamento,
+    public Emblema(String nome, int raridade, int idConquistado, int idNaoConquistado, String descricaoRapida,
+            String descricaoCompleta, String dataLancamento, String localLancamento,
             String modoConquista, String identificador) {
         this.nome = nome;
-        this.categoria = categoria;
         this.idConquistado = idConquistado;
         this.idNaoConquistado = idNaoConquistado;
         this.descricaoRapida = descricaoRapida;
@@ -31,10 +29,6 @@ public class Emblema {
 
     public String getNome() {
         return this.nome;
-    }
-
-    public String getCategoria() {
-        return this.categoria;
     }
 
     public int getCustomModelData() {

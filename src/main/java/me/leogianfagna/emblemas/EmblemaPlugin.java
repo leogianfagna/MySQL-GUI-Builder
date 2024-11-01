@@ -53,7 +53,6 @@ public class EmblemaPlugin extends JavaPlugin {
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "nome VARCHAR(100), " +
                     "identificador VARCHAR(100), " +
-                    "categoria VARCHAR(20), " +
                     "custom_conquistado INT, " +
                     "custom_black INT, " +
                     "descricao_rapida VARCHAR(255), " +

@@ -23,27 +23,14 @@ public class AddEmblemaCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Este comando só pode ser executado por um jogador.");
-            return true;
-        }
-
-        if (args.length < 10) {
-            sender.sendMessage("Uso incorreto! Use: /addemblema <nome> <identificador> <categoria> <idConquistado> <idNaoConquistado> <\"descrição rápida\"> <\"descrição completa\"> <raridade> <data de lançamento> <local de lançamento> <modo de conquista>");
-            return true;
-        }
-
-        List<String> argumentos = parseArguments(args);
-        if (argumentos.size() < 11) {
-            sender.sendMessage("Uso incorreto! Verifique os argumentos fornecidos.");
-            return true;
-        }
 
         try {
+            List<String> argumentos = parseArguments(args);
             inserirEmblemaNoBanco(argumentos, sender);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            sender.sendMessage("Erro ao adicionar o emblema. Detalhes do erro: " + e.getMessage());
+            sender.sendMessage("Erro ao adicionar o emblema. Confira a documentação do comando coretamente.");
+            sender.sendMessage("Detalhes do erro: " + e.getMessage());
         }
 
         return true;
@@ -69,30 +56,28 @@ public class AddEmblemaCommand implements CommandExecutor {
     private void inserirEmblemaNoBanco(List<String> argumentos, CommandSender sender) throws SQLException {
         String nome = argumentos.get(0);
         String identificador = argumentos.get(1);
-        String categoria = argumentos.get(2);
+        int raridade = Integer.parseInt(argumentos.get(2));
         int idConquistado = parseInt(argumentos.get(3), sender);
         int idNaoConquistado = parseInt(argumentos.get(4), sender);
         String descricaoRapida = argumentos.get(5);
         String descricaoCompleta = argumentos.get(6);
-        String raridade = argumentos.get(7);
-        String dataLancamento = argumentos.get(8);
-        String localLancamento = argumentos.get(9);
-        String modoConquista = argumentos.get(10);
+        String dataLancamento = argumentos.get(7);
+        String localLancamento = argumentos.get(8);
+        String modoConquista = argumentos.get(9);
 
-        String sql = "INSERT INTO emblemas (nome, identificador, categoria, custom_conquistado, custom_black, descricao_rapida, descricao_completa, raridade, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO emblemas (nome, identificador, raridade, custom_conquistado, custom_black, descricao_rapida, descricao_completa, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, nome);
             stmt.setString(2, identificador);
-            stmt.setString(3, categoria);
+            stmt.setInt(3, raridade);
             stmt.setInt(4, idConquistado);
             stmt.setInt(5, idNaoConquistado);
             stmt.setString(6, descricaoRapida);
             stmt.setString(7, descricaoCompleta);
-            stmt.setString(8, raridade);
-            stmt.setString(9, dataLancamento);
-            stmt.setString(10, localLancamento);
-            stmt.setString(11, modoConquista);
+            stmt.setString(8, dataLancamento);
+            stmt.setString(9, localLancamento);
+            stmt.setString(10, modoConquista);
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
