@@ -1,5 +1,6 @@
 package me.leogianfagna.emblemas;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,10 +21,10 @@ public class EmblemaCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            int raridadeFiltro = 0; // padrão, exibe todos
-            int pagina = 1; // página padrão
-    
-            // Se o argumento de raridade foi fornecido, tenta interpretá-lo como número
+            int raridadeFiltro = 0;
+            int pagina = 1;
+
+            // Processar argumentos
             if (args.length > 0) {
                 try {
                     raridadeFiltro = Integer.parseInt(args[0]);
@@ -32,8 +33,6 @@ public class EmblemaCommand implements CommandExecutor {
                     return true;
                 }
             }
-    
-            // Se o argumento de página foi fornecido, tenta interpretá-lo como número
             if (args.length > 1) {
                 try {
                     pagina = Integer.parseInt(args[1]);
@@ -46,13 +45,25 @@ public class EmblemaCommand implements CommandExecutor {
                     return true;
                 }
             }
-    
-            // Passa a raridade e a página como argumentos para o método openAlbum
-            EmblemaGUI.openAlbum(player, emblemaManager.getEmblemas(raridadeFiltro), plugin, emblemaManager, raridadeFiltro, pagina);
+            
+            final int raridadeLambda = raridadeFiltro;
+            final int paginaLambda = pagina;
+            
+            // Executa a consulta de forma assíncrona
+            emblemaManager.getEmblemasAsync(raridadeFiltro).thenAccept(emblemas -> {
+
+                // Volta para a thread principal para abrir o inventário
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    EmblemaGUI.openAlbum(player, emblemas, plugin, emblemaManager, raridadeLambda, paginaLambda);
+                });
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                player.sendMessage("Ocorreu um erro ao buscar os emblemas.");
+                return null;
+            });
             return true;
         }
         return false;
     }
-    
 
 }
