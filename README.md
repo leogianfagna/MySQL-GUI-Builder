@@ -8,9 +8,6 @@
 /album -> abre tudo
 /album <raridade> <pag>
 
-## O que falta
-1. Code clean up
-2. Javadocs
-3. Só! :)
-4. Bônus: Placar de conquista
-5. Bônus: Contagem de emblemas por categorias (para menus principais e placeholders). Javascript dá conta disso por enquanto.
+## Bônus
+1. Placar de conquista
+2. Contagem de emblemas por categorias (para menus principais e placeholders). Javascript dá conta disso por enquanto.

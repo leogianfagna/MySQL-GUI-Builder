@@ -20,9 +20,15 @@ public class AddEmblemaCommand implements CommandExecutor {
         this.connection = connection;
     }
 
+    /*
+     * Vai receber todos os argumentos do comando /addemblema e tentar inserir no
+     * banco baseado nisso. Fica tudo em um try-catch
+     * pois como é um plugin pessoal, não precisa ficar tratando cada exceção e só
+     * manda uma imagem final.
+     */
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
         try {
             List<String> argumentos = parseArguments(args);
             inserirEmblemaNoBanco(argumentos, sender);
@@ -35,7 +41,8 @@ public class AddEmblemaCommand implements CommandExecutor {
         return true;
     }
 
-    // Possibilitar colocar argumentos entre aspas, pois descrições ou nome dos emblemas exigem espaços e isso causaria a leitura de argumentos a mais
+    // Possibilitar colocar argumentos entre aspas, pois descrições ou nome dos
+    // emblemas exigem espaços e isso causaria a leitura de argumentos a mais
     private List<String> parseArguments(String[] args) {
         String input = String.join(" ", args);
         List<String> argumentos = new ArrayList<>();
@@ -56,8 +63,8 @@ public class AddEmblemaCommand implements CommandExecutor {
         String nome = argumentos.get(0);
         String identificador = argumentos.get(1);
         int raridade = Integer.parseInt(argumentos.get(2));
-        int idConquistado = parseInt(argumentos.get(3), sender);
-        int idNaoConquistado = parseInt(argumentos.get(4), sender);
+        int idConquistado = Integer.parseInt(argumentos.get(3));
+        int idNaoConquistado = Integer.parseInt(argumentos.get(4));
         String descricaoRapida = argumentos.get(5);
         String descricaoCompleta = argumentos.get(6);
         String dataLancamento = argumentos.get(7);
@@ -84,15 +91,6 @@ public class AddEmblemaCommand implements CommandExecutor {
             } else {
                 sender.sendMessage("A inserção falhou, nenhuma linha foi afetada.");
             }
-        }
-    }
-
-    private int parseInt(String input, CommandSender sender) {
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            sender.sendMessage("IDs devem ser números inteiros.");
-            return 0;
         }
     }
 }

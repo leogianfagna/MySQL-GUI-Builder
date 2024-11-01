@@ -17,6 +17,13 @@ public class EmblemaCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
+    /*
+     * Comando registrado como /album <raridade>. Vai socilitar uma raridade de 1-6
+     * e pode incluir o número da página depois. Se não for incluída vai ser aberto
+     * na primeira página. Se sucesso, vai resgatar os emblemas do banco baseado na
+     * raridade fornecida no argumento e depois abrir o album, com a classe
+     * EmblemaGUI, tudo em uma async task.
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
@@ -45,10 +52,10 @@ public class EmblemaCommand implements CommandExecutor {
                     return true;
                 }
             }
-            
+
             final int raridadeLambda = raridadeFiltro;
             final int paginaLambda = pagina;
-            
+
             // Executa a consulta de forma assíncrona
             emblemaManager.getEmblemasAsync(raridadeFiltro).thenAccept(emblemas -> {
 

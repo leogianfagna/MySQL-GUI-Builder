@@ -24,9 +24,15 @@ public class AlbumMenuListener implements Listener {
         this.pagina = pagina;
     }
 
+    /*
+     * Listener registrado na classe EmblemaGUI ao criar o álbum de emblemas. Cria
+     * os botões de paginação e cancela os eventos para os jogadores não retiraram
+     * emblemas ou colocarem itens no menu.
+     */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getClickedInventory() == null || event.getCurrentItem() == null) return;
+        if (event.getClickedInventory() == null || event.getCurrentItem() == null)
+            return;
 
         if (event.getView().getTopInventory().equals(album)) {
             event.setCancelled(true); // Impede movimentação de itens
@@ -38,7 +44,7 @@ public class AlbumMenuListener implements Listener {
             if (config.contains(NEXT_BUTTON_KEY + "." + slotClicado)) {
                 comando = "/album " + raridadeFiltro + " " + (pagina + 1);
             } else if (config.contains(PREVIOUS_BUTTON_KEY + "." + slotClicado)) {
-                
+
                 if ((pagina - 1) < 1) {
                     comando = null;
                 } else {

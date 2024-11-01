@@ -19,6 +19,11 @@ public class EntregarEmblemaCommand implements CommandExecutor {
         this.connection = connection;
     }
 
+    /*
+     * A entrega de emblema adiciona uma linha em uma nova tabela do banco de dados,
+     * como se fosse as permissões de um jogador. É feito com UUID para seguir um
+     * padrão melhor de qualidade, caso o jogador troque de nick.
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
@@ -38,10 +43,8 @@ public class EntregarEmblemaCommand implements CommandExecutor {
 
         UUID playerUUID = target.getUniqueId();
 
-        // Entregar emblema
         if (entregarEmblema(playerUUID, emblemaNome)) {
             sender.sendMessage("Emblema " + emblemaNome + " entregue para " + nick + " com sucesso!");
-            target.sendMessage("Você recebeu o emblema: " + emblemaNome + "!");
         } else {
             sender.sendMessage("O jogador já possui este emblema ou não foi possível entregá-lo.");
         }
@@ -49,6 +52,10 @@ public class EntregarEmblemaCommand implements CommandExecutor {
         return true;
     }
 
+    /*
+     * Comando que insere no banco de dados. Retorna falso se tiver uma exceção do
+     * código 1062, que simboliza código de erro para duplicata no MySQL.
+     */
     private boolean entregarEmblema(UUID playerUUID, String emblemaId) {
         String insertSQL = "INSERT INTO user_emblemas (player_uuid, emblema_id) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE emblema_id = emblema_id";
@@ -58,7 +65,7 @@ public class EntregarEmblemaCommand implements CommandExecutor {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) { // Código de erro para duplicata no MySQL
+            if (e.getErrorCode() == 1062) {
                 return false;
             }
             e.printStackTrace();
@@ -66,4 +73,3 @@ public class EntregarEmblemaCommand implements CommandExecutor {
         return false;
     }
 }
-

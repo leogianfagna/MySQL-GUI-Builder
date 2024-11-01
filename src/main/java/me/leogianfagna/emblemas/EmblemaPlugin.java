@@ -42,7 +42,6 @@ public class EmblemaPlugin extends JavaPlugin {
         String user = getConfig().getString("mysql.username");
         String password = getConfig().getString("mysql.password");
 
-        // Inclui o parâmetro de SSL falso
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
 
         try {
