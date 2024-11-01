@@ -2,7 +2,7 @@
 /entregaremblema WaKaliTe halloween-herobrine
 
 ## Criar novo emblema
-/addemblema "Alguma outra coisa" halloween-herobriner lendario 5007 50007 "Alguma descrição!" "Uma descrição longa e detalhada" 3 10/10/2024 Henesys Não
+/addemblema "Alguma outra coisa" 3 halloween-herobriner 5007 50007 "Alguma descrição!" "Uma descrição longa e detalhada" 10/10/2024 Henesys Não
 
 ## Abrir menu
 /album -> abre tudo

@@ -2,6 +2,7 @@ main: me.leogianfagna.emblemas.EmblemaPlugin
 name: EmblemasAustv
 version: 1.0
 api-version: "1.20"
+depend: [Essentials]
 commands:
   album:
     description: "Abre o álbum de emblemas."

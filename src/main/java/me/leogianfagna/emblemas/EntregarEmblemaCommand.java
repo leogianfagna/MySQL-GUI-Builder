@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.UUID;
 
 public class EntregarEmblemaCommand implements CommandExecutor {
 
@@ -21,8 +20,9 @@ public class EntregarEmblemaCommand implements CommandExecutor {
 
     /*
      * A entrega de emblema adiciona uma linha em uma nova tabela do banco de dados,
-     * como se fosse as permissões de um jogador. É feito com UUID para seguir um
-     * padrão melhor de qualidade, caso o jogador troque de nick.
+     * como se fosse as permissões de um jogador. É feito com nick ao invés do UUID
+     * pois não foi encontrado métodos sem ser deprecated ou muito difíceis de fazer
+     * para resgatar o UUID de jogadores off-line.
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -41,9 +41,7 @@ public class EntregarEmblemaCommand implements CommandExecutor {
             return true;
         }
 
-        UUID playerUUID = target.getUniqueId();
-
-        if (entregarEmblema(playerUUID, emblemaNome)) {
+        if (entregarEmblema(nick, emblemaNome)) {
             sender.sendMessage("Emblema " + emblemaNome + " entregue para " + nick + " com sucesso!");
         } else {
             sender.sendMessage("O jogador já possui este emblema ou não foi possível entregá-lo.");
@@ -56,11 +54,11 @@ public class EntregarEmblemaCommand implements CommandExecutor {
      * Comando que insere no banco de dados. Retorna falso se tiver uma exceção do
      * código 1062, que simboliza código de erro para duplicata no MySQL.
      */
-    private boolean entregarEmblema(UUID playerUUID, String emblemaId) {
-        String insertSQL = "INSERT INTO user_emblemas (player_uuid, emblema_id) VALUES (?, ?) " +
+    private boolean entregarEmblema(String player, String emblemaId) {
+        String insertSQL = "INSERT INTO user_emblemas (player, emblema_id) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE emblema_id = emblema_id";
         try (PreparedStatement stmt = connection.prepareStatement(insertSQL)) {
-            stmt.setString(1, playerUUID.toString());
+            stmt.setString(1, player.toString());
             stmt.setString(2, emblemaId);
             stmt.executeUpdate();
             return true;

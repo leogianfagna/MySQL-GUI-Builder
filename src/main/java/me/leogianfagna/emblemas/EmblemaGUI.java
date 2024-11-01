@@ -40,10 +40,9 @@ public class EmblemaGUI {
         int guiSize = validateGuiSize(config.getInt(CONFIG_SIZE_KEY, DEFAULT_GUI_SIZE));
 
         Inventory album = Bukkit.createInventory(null, guiSize, title);
-        UUID playerUUID = player.getUniqueId();
 
         configureNavigationButtons(album, config, fillSet);
-        fillEmblemasInAlbum(album, emblemas, emblemaManager, fillSet, raridadeFiltro, pagina, playerUUID);
+        fillEmblemasInAlbum(album, emblemas, emblemaManager, fillSet, raridadeFiltro, pagina, player);
         player.openInventory(album);
         Bukkit.getPluginManager().registerEvents(new AlbumMenuListener(album, config, raridadeFiltro, pagina), plugin);
     }
@@ -86,7 +85,7 @@ public class EmblemaGUI {
      * "emblemas" e já recebe os emblemas filtrados pela categoria.
      */
     private static void fillEmblemasInAlbum(Inventory album, List<Emblema> emblemas, EmblemaManager emblemaManager,
-            Set<Integer> fillSet, int raridadeFiltro, int pagina, UUID playerUUID) {
+            Set<Integer> fillSet, int raridadeFiltro, int pagina, Player player) {
         int start = (pagina - 1) * MAX_EMBLEMAS_PER_PAGE;
         int end = Math.min(start + MAX_EMBLEMAS_PER_PAGE, emblemas.size());
         int slot = 0;
@@ -98,7 +97,7 @@ public class EmblemaGUI {
                 slot++;
             }
 
-            album.setItem(slot, createEmblemaItem(emblema, playerUUID, emblemaManager));
+            album.setItem(slot, createEmblemaItem(emblema, player, emblemaManager));
             slot++;
         }
     }
@@ -107,21 +106,21 @@ public class EmblemaGUI {
      * Configurações do emblema. Usa a função abaixo createLore para adicionar as
      * lores e todas as informações do emblema
      */
-    private static ItemStack createEmblemaItem(Emblema emblema, UUID playerUUID, EmblemaManager emblemaManager) {
+    private static ItemStack createEmblemaItem(Emblema emblema, Player player, EmblemaManager emblemaManager) {
         ItemStack item = new ItemStack(Material.DIAMOND);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName("§a" + emblema.getNome());
-            meta.setLore(createLore(emblema, playerUUID, emblemaManager));
+            meta.setLore(createLore(emblema, player, emblemaManager));
             meta.setCustomModelData(
-                    emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador()) ? emblema.getCustomModelData()
+                    emblemaManager.possuiEmblema(player.getName(), emblema.getIdentificador()) ? emblema.getCustomModelData()
                             : emblema.getCustomBlack());
             item.setItemMeta(meta);
         }
         return item;
     }
 
-    private static List<String> createLore(Emblema emblema, UUID playerUUID, EmblemaManager emblemaManager) {
+    private static List<String> createLore(Emblema emblema, Player player, EmblemaManager emblemaManager) {
         List<String> lore = new ArrayList<>();
         lore.add(LoreUtils.emblemaRaridade(emblema.getRaridade()));
         lore.add("");
@@ -132,7 +131,7 @@ public class EmblemaGUI {
         lore.add("§a» §fConquistável: §7" + emblema.getModoConquista());
         lore.add("§a» §fPossuído por: §7" + emblemaManager.contarPossuidoresEmblema(emblema.getIdentificador()));
 
-        if (!emblemaManager.possuiEmblema(playerUUID, emblema.getIdentificador())) {
+        if (!emblemaManager.possuiEmblema(player.getName(), emblema.getIdentificador())) {
             lore.add("");
             lore.add("§8" + emblema.getDescricaoCompleta());
         }

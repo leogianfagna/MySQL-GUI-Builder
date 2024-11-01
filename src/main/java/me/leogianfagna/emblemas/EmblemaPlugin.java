@@ -64,9 +64,9 @@ public class EmblemaPlugin extends JavaPlugin {
 
             String donosListTableSql = "CREATE TABLE IF NOT EXISTS user_emblemas (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                    "player_uuid CHAR(36), " +
+                    "player CHAR(36), " +
                     "emblema_id VARCHAR(50), " +
-                    "UNIQUE (player_uuid, emblema_id) " +
+                    "UNIQUE (player, emblema_id) " +
                     ")";
 
             connection.prepareStatement(emblemasListTableSql).executeUpdate();
