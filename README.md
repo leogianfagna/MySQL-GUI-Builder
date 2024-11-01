@@ -9,10 +9,8 @@
 /album <raridade> <pag>
 
 ## O que falta
-1. Improve: não precisa do nome da categoria, dá para filtrar usando a raridade!
-2. Não poder colocar blocos na GUI.
-3. Code clean up
-4. Javadocs
-5. Só! :)
-6. Bônus: Placar de conquista
-7. Bônus: Contagem de emblemas por categorias (para menus principais e placeholders). Javascript dá conta disso por enquanto.
+1. Code clean up
+2. Javadocs
+3. Só! :)
+4. Bônus: Placar de conquista
+5. Bônus: Contagem de emblemas por categorias (para menus principais e placeholders). Javascript dá conta disso por enquanto.

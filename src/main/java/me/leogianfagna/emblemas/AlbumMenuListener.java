@@ -28,7 +28,7 @@ public class AlbumMenuListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null || event.getCurrentItem() == null) return;
 
-        if (event.getClickedInventory().equals(album)) {
+        if (event.getView().getTopInventory().equals(album)) {
             event.setCancelled(true); // Impede movimentação de itens
 
             Player player = (Player) event.getWhoClicked();
