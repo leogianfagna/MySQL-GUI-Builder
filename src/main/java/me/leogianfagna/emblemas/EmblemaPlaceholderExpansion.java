@@ -58,7 +58,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 cacheKey = "qtd_" + raridade;
 
                 Integer cachedCount = cache.get(cacheKey);
-                if (cachedCount != null) {
+                if (cachedCount != null && cachedCount != -1) {
                     return String.valueOf(cachedCount);
                 } else {
                     cache.put(cacheKey, -1);
@@ -80,7 +80,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 cacheKey = "qtdp_" + player.getName() + "_" + raridade;
 
                 Integer cachedCount = cache.get(cacheKey);
-                if (cachedCount != null) {
+                if (cachedCount != null && cachedCount != -1) {
                     return String.valueOf(cachedCount);
                 } else {
                     cache.put(cacheKey, -1);
@@ -101,7 +101,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 cacheKey = "qtdp_" + player.getName();
 
                 Integer cachedCount = cache.get(cacheKey);
-                if (cachedCount != null) {
+                if (cachedCount != null && cachedCount != -1) {
                     return String.valueOf(cachedCount);
                 } else {
                     cache.put(cacheKey, -1);
@@ -122,7 +122,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 cacheKey = "qtd_" + player.getName();
 
                 Integer cachedCount = cache.get(cacheKey);
-                if (cachedCount != null) {
+                if (cachedCount != null && cachedCount != -1) {
                     return String.valueOf(cachedCount);
                 } else {
                     cache.put(cacheKey, -1);
@@ -143,7 +143,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 cacheKey = "placarmax_" + player.getName();
 
                 Integer cachedCount = cache.get(cacheKey);
-                if (cachedCount != null) {
+                if (cachedCount != null && cachedCount != -1) {
                     return String.valueOf(cachedCount);
                 } else {
                     cache.put(cacheKey, -1);
@@ -164,7 +164,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 cacheKey = "placar_" + player.getName();
 
                 Integer cachedCount = cache.get(cacheKey);
-                if (cachedCount != null) {
+                if (cachedCount != null && cachedCount != -1) {
                     return String.valueOf(cachedCount);
                 } else {
                     cache.put(cacheKey, -1);
