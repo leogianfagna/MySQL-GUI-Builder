@@ -8,6 +8,13 @@
 /album -> abre tudo
 /album <raridade> <pag>
 
-## Bônus
-1. Placar de conquista
-2. Contagem de emblemas por categorias (para menus principais e placeholders). Javascript dá conta disso por enquanto.
+## To-do
+1. Clicar em um emblema define ele no MyCommand.
+
+# Placeholders
+- `%austvemblemas_qtd_<num>%`: Quantia de emblemas por categoria.
+- `%austvemblemas_qtdp_<num>%`: Quantia de emblemas do jogador por categoria.
+- `%austvemblemas_qtd%`: Quantia total de emblemas do servidor.
+- `%austvemblemas_qtdp%`: Quantia total de emblemas do jogador.
+- `%austvemblemas_placarmax%`: Máximo de um placar de conquista (soma todos emblemas).
+- `%austvemblemas_placar%`: Placar de conquista de um jogador.
