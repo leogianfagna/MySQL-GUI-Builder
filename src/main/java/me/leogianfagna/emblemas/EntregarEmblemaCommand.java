@@ -34,14 +34,7 @@ public class EntregarEmblemaCommand implements CommandExecutor {
         String nick = args[0];
         String emblemaNome = args[1];
 
-        // Busca o jogador pelo nick
-        Player target = Bukkit.getPlayer(nick);
-        if (target == null) {
-            sender.sendMessage("Jogador não encontrado ou offline.");
-            return true;
-        }
-
-        if (entregarEmblema(nick, emblemaNome)) {
+        if (entregarEmblema(nick.toLowerCase(), emblemaNome)) {
             sender.sendMessage("Emblema " + emblemaNome + " entregue para " + nick + " com sucesso!");
         } else {
             sender.sendMessage("O jogador já possui este emblema ou não foi possível entregá-lo.");
@@ -58,7 +51,7 @@ public class EntregarEmblemaCommand implements CommandExecutor {
         String insertSQL = "INSERT INTO emblemas_users (player, emblema_id) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE emblema_id = emblema_id";
         try (PreparedStatement stmt = connection.prepareStatement(insertSQL)) {
-            stmt.setString(1, player.toString());
+            stmt.setString(1, player);
             stmt.setString(2, emblemaId);
             stmt.executeUpdate();
             return true;

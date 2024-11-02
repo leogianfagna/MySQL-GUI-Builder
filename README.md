@@ -2,7 +2,7 @@
 /entregaremblema WaKaliTe halloween-herobrine
 
 ## Criar novo emblema
-/addemblema "Alguma outra coisa" 3 halloween-herobriner 5007 50007 "Alguma descrição!" "Uma descrição longa e detalhada" 10/10/2024 Henesys Não
+/addemblema "Noite do Herobrine" halloween_herobrine_24 4 5125 50108 "Esse demônio não teve chances contra mim." "Esse emblema pertence aos jogadores que juntos derrotaram o Herobrine durante o Halloween." 1/10/2024 Auseventos Não
 
 ## Abrir menu
 /album -> abre tudo
