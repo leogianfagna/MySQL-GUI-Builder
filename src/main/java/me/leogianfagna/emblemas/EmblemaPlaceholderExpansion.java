@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
 
-    private final ConcurrentHashMap<Integer, Integer> cache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer> cache = new ConcurrentHashMap<>();
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final Connection connection;
     private final EmblemaPlugin plugin;
@@ -40,26 +40,33 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
     }
 
     /*
-     * Cria o placeholder %austvemblemas_qtd_<num>%, num sendo a raridade de 1-6 e
-     * conta quantos emblemas possuem naquela categoria. Usa cache e tarefa
-     * assíncrona para não pesar em nada no desempenho do servidor.
+     * Cria placeholders. Os que possuem buscas no banco de dados usam cache e
+     * tarefas assíncronas para não pesar em nada no desempenho do servidor. Usa
+     * cacheKey para cria uma variável de cache diferente para cada, pois não pode
+     * usar a mesma. Limpa o cache usando cache.remove().
+     * 
+     * Placeholders:
+     * - %austvemblemas_qtd_<num>% => Quantia de emblemas por categoria
+     * - %austvemblemas_qtdp_<num>% => Quantia de emblemas do jogador por categoria.
      */
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
+        String cacheKey;
+
         if (identifier.startsWith("qtd_")) {
             try {
-                int raridade = Integer.parseInt(identifier.substring("qnt_".length()));
+                int raridade = Integer.parseInt(identifier.substring("qtd_".length()));
+                cacheKey = "qtd_" + raridade; 
 
-                // Verifica o cache primeiro
-                Integer cachedCount = cache.get(raridade);
+                Integer cachedCount = cache.get(cacheKey);
                 if (cachedCount != null) {
                     return String.valueOf(cachedCount);
                 } else {
-                    cache.put(raridade, -1); // Indicador de carregamento
+                    cache.put(cacheKey, -1);
                     executor.submit(() -> {
                         int count = getEmblemaCountByRaridade(raridade);
-                        cache.put(raridade, count);
-                        Bukkit.getScheduler().runTaskLater(plugin, () -> cache.remove(raridade), 600L); // Limpa o cache
+                        cache.put(cacheKey, count);
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> cache.remove(cacheKey), 600L);
                     });
                     return "...";
                 }
@@ -67,6 +74,29 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
                 return "Erro: raridade inválida.";
             }
         }
+
+        if (identifier.startsWith("qtdp_")) {
+            try {
+                int raridade = Integer.parseInt(identifier.substring("qtdp_".length()));
+                cacheKey = "qtdp_" + player.getName() + "_" + raridade;
+
+                Integer cachedCount = cache.get(cacheKey);
+                if (cachedCount != null) {
+                    return String.valueOf(cachedCount);
+                } else {
+                    cache.put(cacheKey, -1);
+                    executor.submit(() -> {
+                        int count = getPlayerCountByRaridade(player.getName(), raridade);
+                        cache.put(cacheKey, count);
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> cache.remove(cacheKey), 600L);
+                    });
+                    return "...";
+                }
+            } catch (NumberFormatException e) {
+                return "Erro: raridade inválida.";
+            }
+        }
+
         return null;
     }
 
@@ -76,6 +106,25 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, raridade);
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) { // Move para a primeira linha, se existir
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    private int getPlayerCountByRaridade(String player, int raridade) {
+        int count = 0;
+        String query = "SELECT COUNT(*) AS quantidade_emblemas FROM emblemas_users eu JOIN emblemas_list el ON eu.emblema_id = el.identificador WHERE eu.player = ? AND el.raridade = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, player);
+            statement.setInt(2, raridade);
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) { // Move para a primeira linha, se existir
