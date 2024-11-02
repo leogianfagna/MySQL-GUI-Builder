@@ -55,7 +55,7 @@ public class EntregarEmblemaCommand implements CommandExecutor {
      * código 1062, que simboliza código de erro para duplicata no MySQL.
      */
     private boolean entregarEmblema(String player, String emblemaId) {
-        String insertSQL = "INSERT INTO user_emblemas (player, emblema_id) VALUES (?, ?) " +
+        String insertSQL = "INSERT INTO emblemas_users (player, emblema_id) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE emblema_id = emblema_id";
         try (PreparedStatement stmt = connection.prepareStatement(insertSQL)) {
             stmt.setString(1, player.toString());

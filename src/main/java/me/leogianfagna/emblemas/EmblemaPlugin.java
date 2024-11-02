@@ -53,7 +53,7 @@ public class EmblemaPlugin extends JavaPlugin {
             connection = DriverManager.getConnection(url, user, password);
             getLogger().info("Conectado ao banco de dados MySQL com sucesso!");
 
-            String emblemasListTableSql = "CREATE TABLE IF NOT EXISTS emblemas (" +
+            String emblemasListTableSql = "CREATE TABLE IF NOT EXISTS emblemas_list (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "nome VARCHAR(100), " +
                     "identificador VARCHAR(100), " +
@@ -67,7 +67,7 @@ public class EmblemaPlugin extends JavaPlugin {
                     "modo_conquista VARCHAR(50) " +
                     ")";
 
-            String donosListTableSql = "CREATE TABLE IF NOT EXISTS user_emblemas (" +
+            String donosListTableSql = "CREATE TABLE IF NOT EXISTS emblemas_users (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "player CHAR(36), " +
                     "emblema_id VARCHAR(50), " +

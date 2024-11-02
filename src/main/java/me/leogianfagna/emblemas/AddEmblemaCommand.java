@@ -71,7 +71,7 @@ public class AddEmblemaCommand implements CommandExecutor {
         String localLancamento = argumentos.get(8);
         String modoConquista = argumentos.get(9);
 
-        String sql = "INSERT INTO emblemas (nome, identificador, raridade, custom_conquistado, custom_black, descricao_rapida, descricao_completa, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO emblemas_list (nome, identificador, raridade, custom_conquistado, custom_black, descricao_rapida, descricao_completa, data_lancamento, local_lancamento, modo_conquista) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, nome);

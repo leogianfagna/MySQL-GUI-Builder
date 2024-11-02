@@ -72,7 +72,7 @@ public class EmblemaPlaceholderExpansion extends PlaceholderExpansion {
 
     private int getEmblemaCountByRaridade(int raridade) {
         int count = 0;
-        String query = "SELECT COUNT(*) FROM emblemas WHERE raridade = ?";
+        String query = "SELECT COUNT(*) FROM emblemas_list WHERE raridade = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, raridade);

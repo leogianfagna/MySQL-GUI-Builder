@@ -24,7 +24,7 @@ public class EmblemaManager {
     public CompletableFuture<List<Emblema>> getEmblemasAsync(int categoria) {
         return CompletableFuture.supplyAsync(() -> {
             List<Emblema> emblemas = new ArrayList<>();
-            String query = "SELECT * FROM emblemas WHERE raridade = ?";
+            String query = "SELECT * FROM emblemas_list WHERE raridade = ?";
 
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, categoria);
@@ -55,7 +55,7 @@ public class EmblemaManager {
      * como acrescentar a descrição completa.
      */
     public boolean possuiEmblema(String player, String emblemaId) {
-        String query = "SELECT 1 FROM user_emblemas WHERE player = ? AND emblema_id = ?";
+        String query = "SELECT 1 FROM emblemas_users WHERE player = ? AND emblema_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, player);
             stmt.setString(2, emblemaId);
@@ -72,7 +72,7 @@ public class EmblemaManager {
      * feito por um placeholder externo.
      */
     public int contarPossuidoresEmblema(String emblemaId) {
-        String query = "SELECT COUNT(*) FROM user_emblemas WHERE emblema_id = ?";
+        String query = "SELECT COUNT(*) FROM emblemas_users WHERE emblema_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, emblemaId);
             ResultSet rs = stmt.executeQuery();
