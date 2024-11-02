@@ -113,7 +113,8 @@ public class EmblemaGUI {
             meta.setDisplayName("§a" + emblema.getNome());
             meta.setLore(createLore(emblema, player, emblemaManager));
             meta.setCustomModelData(
-                    emblemaManager.possuiEmblema(player.getName(), emblema.getIdentificador()) ? emblema.getCustomModelData()
+                    emblemaManager.possuiEmblema(player.getName(), emblema.getIdentificador())
+                            ? emblema.getCustomModelData()
                             : emblema.getCustomBlack());
             item.setItemMeta(meta);
         }
@@ -133,7 +134,9 @@ public class EmblemaGUI {
 
         if (!emblemaManager.possuiEmblema(player.getName(), emblema.getIdentificador())) {
             lore.add("");
-            lore.add("§8" + emblema.getDescricaoCompleta());
+            for (String linha : formatarDescricao(emblema.getDescricaoCompleta(), 45)) {
+                lore.add(linha);
+            }
         }
         return lore;
     }
@@ -158,4 +161,25 @@ public class EmblemaGUI {
             e.printStackTrace();
         }
     }
+
+    public static List<String> formatarDescricao(String descricao, int limiteCaracteres) {
+        List<String> linhas = new ArrayList<>();
+        String[] palavras = descricao.split(" ");
+        StringBuilder linhaAtual = new StringBuilder();
+
+        for (String palavra : palavras) {
+            if (linhaAtual.length() + palavra.length() + 1 > limiteCaracteres) {
+                linhas.add("§8" + linhaAtual.toString().trim());
+                linhaAtual = new StringBuilder();
+            }
+            linhaAtual.append(palavra).append(" ");
+        }
+        
+        // Adiciona a última linha se houver conteúdo restante
+        if (linhaAtual.length() > 0) {
+            linhas.add("§8" + linhaAtual.toString().trim());
+        }
+        return linhas;
+    }
+
 }
