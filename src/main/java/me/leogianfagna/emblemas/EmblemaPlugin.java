@@ -47,7 +47,7 @@ public class EmblemaPlugin extends JavaPlugin {
         String user = getConfig().getString("mysql.username");
         String password = getConfig().getString("mysql.password");
 
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&autoReconnect=true";
 
         try {
             connection = DriverManager.getConnection(url, user, password);
