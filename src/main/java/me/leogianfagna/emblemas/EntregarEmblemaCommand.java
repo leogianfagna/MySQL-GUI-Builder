@@ -7,10 +7,14 @@ import org.bukkit.command.CommandSender;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class EntregarEmblemaCommand implements CommandExecutor {
 
     private final Connection connection;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public EntregarEmblemaCommand(Connection connection) {
         this.connection = connection;
@@ -45,7 +49,7 @@ public class EntregarEmblemaCommand implements CommandExecutor {
      * Comando que insere no banco de dados. Retorna falso se tiver uma exceção do
      * código 1062, que simboliza código de erro para duplicata no MySQL.
      */
-    private boolean entregarEmblema(String player, String emblemaId) {
+    private boolean entregarEmblema(String player, String emblemaId, boolean retry) {
         String insertSQL = "INSERT INTO emblemas_users (player, emblema_id) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE emblema_id = emblema_id";
         try (PreparedStatement stmt = connection.prepareStatement(insertSQL)) {
@@ -55,10 +59,18 @@ public class EntregarEmblemaCommand implements CommandExecutor {
             return true;
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062) {
-                return false;
+                return false; // Erro de chave duplicada, já existe
             }
-            e.printStackTrace();
+
+            // Executa o comando de novo, pois pode acontecer da conexão estar fechada
+            if (!retry) {
+                scheduler.schedule(() -> entregarEmblema(player, emblemaId, true), 1, TimeUnit.SECONDS);
+            }
         }
         return false;
+    }
+
+    public boolean entregarEmblema(String player, String emblemaId) {
+        return entregarEmblema(player, emblemaId, false);
     }
 }
